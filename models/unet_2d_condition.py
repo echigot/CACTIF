@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional, Tuple, Union
 import torch
 import torch.utils.checkpoint
 from diffusers import UNet2DConditionModel
-from diffusers.models.unet_2d_condition import UNet2DConditionOutput
+from diffusers.models.unets.unet_2d_condition import UNet2DConditionOutput
 from diffusers.utils import logging
 from torch.fft import fftn, ifftn, fftshift, ifftshift
 

@@ -10,8 +10,8 @@ from diffusers.schedulers import KarrasDiffusionSchedulers
 from tqdm import tqdm
 from transformers import CLIPTextModel, CLIPTokenizer, CLIPImageProcessor
 
-from config import Range
-from models.unet_2d_condition import FreeUUNet2DConditionModel
+from ..config import Range
+from .unet_2d_condition import FreeUUNet2DConditionModel
 
 
 class CrossImageAttentionStableDiffusionPipeline(StableDiffusionPipeline):
@@ -22,12 +22,22 @@ class CrossImageAttentionStableDiffusionPipeline(StableDiffusionPipeline):
                  tokenizer: CLIPTokenizer,
                  unet: FreeUUNet2DConditionModel,
                  scheduler: KarrasDiffusionSchedulers,
-                 safety_checker: StableDiffusionSafetyChecker,
-                 feature_extractor: CLIPImageProcessor,
-                 requires_safety_checker: bool = True):
+                 safety_checker: StableDiffusionSafetyChecker = None,
+                 feature_extractor: CLIPImageProcessor = None,
+                 requires_safety_checker: bool = False,
+                 image_encoder = None):
         super().__init__(
-            vae, text_encoder, tokenizer, unet, scheduler, safety_checker, feature_extractor, requires_safety_checker
+            vae=vae,
+            text_encoder=text_encoder,
+            tokenizer=tokenizer,
+            unet=unet,
+            scheduler=scheduler,
+            safety_checker=safety_checker,
+            feature_extractor=feature_extractor,
+            requires_safety_checker=requires_safety_checker,
+            image_encoder=image_encoder
         )
+        
 
     @torch.no_grad()
     def __call__(
@@ -83,7 +93,7 @@ class CrossImageAttentionStableDiffusionPipeline(StableDiffusionPipeline):
         text_encoder_lora_scale = (
             cross_attention_kwargs.get("scale", None) if cross_attention_kwargs is not None else None
         )
-        prompt_embeds = self._encode_prompt(
+        prompt_embeds, negative_prompt_embeds = self.encode_prompt(
             prompt,
             device,
             num_images_per_prompt,
@@ -100,6 +110,7 @@ class CrossImageAttentionStableDiffusionPipeline(StableDiffusionPipeline):
         t_to_idx = {int(v): k for k, v in enumerate(timesteps[-zs[0].shape[0]:])}
         timesteps = timesteps[-zs[0].shape[0]:]
 
+        prompt_embeds = torch.cat([prompt_embeds])
         # 5. Prepare latent variables
         num_channels_latents = self.unet.config.in_channels
         latents = self.prepare_latents(

@@ -6,10 +6,10 @@ import numpy as np
 import torch
 from PIL import Image
 
-from cactif_model import CACTIFModel
-from config import RunConfig
-from utils import image_utils
-from utils.ddpm_inversion import invert
+from ..cactif_model import CACTIFModel
+from ..config import RunConfig
+from ..utils import image_utils
+from ..utils.ddpm_inversion import invert
 
 
 def load_or_invert_one_image(

@@ -4,7 +4,7 @@ from typing import Optional, Tuple
 import numpy as np
 from PIL import Image
 
-from config import RunConfig
+from ..config import RunConfig
 
 
 def open_style_labels(list_path, style_label_root, palette):

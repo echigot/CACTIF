@@ -1,7 +1,7 @@
 import math
 import torch
 
-from constants import *
+from ..constants import *
 
 
 def should_mix_keys_and_values(model, hidden_states: torch.Tensor) -> bool:
